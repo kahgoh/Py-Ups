@@ -2,20 +2,23 @@ import boto3
 import logging
 import pyups.arrays as arrays
 from pathlib import Path
-from pyups.configuration import get_configuration
+from pyups.configuration import Configuration
 from pyups.state.repository import StateRepository
 from botocore.exceptions import ClientError
 
-def backup(repository_path: Path) -> None:
+def backup(repository_path: Path, configuration: Configuration) -> None:
     """
     Parameters
     ----------
     path
         The file system path to the directory that will be backed up. This path 
         is expected to be an existing directory.
+
+    configuration
+        This provides a representation of the configuration for the backup (e.g.
+        which Amazon S3 Bucket to upload backups to).
     """
     s3 = boto3.resource('s3')
-    configuration = get_configuration(repository_path)
     bucket = s3.Bucket(configuration.s3_bucket)
     states = StateRepository(root_path=repository_path)
 

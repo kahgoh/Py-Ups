@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 import logging
 from pathlib import Path
 import pyups.backups as backups
+from pyups.configuration import get_configuration
 
 logging.config.fileConfig('logging.ini')
 
@@ -12,6 +13,6 @@ arguments = parser.parse_args()
 path = Path(arguments.directory)
 if path.exists() and path.is_dir():
     logging.info(f"Backing up directory {arguments.directory}")
-    backups.backup(path)
+    backups.backup(path, get_configuration(path))
 else:
     print(f'Could {path} either does not exist or is not a directory.')
