@@ -57,4 +57,14 @@ def backup(repository_path: Path, configuration: Configuration) -> None:
                 c.commit()
 
     if any_changes == False:
-        logging.info("No changes were detected")
+        if __has_content(states):
+            print("No changes were detected.")
+        else:
+            print(f"Directory '{repository_path}' contains no files to back up.")
+
+def __has_content(states: StateRepository) -> bool:
+    try:
+        next(states.content_paths())
+        return True
+    except StopIteration:
+        return False
