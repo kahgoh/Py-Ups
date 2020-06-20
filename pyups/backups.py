@@ -58,7 +58,7 @@ def backup(repository_path: Path, configuration: Configuration) -> None:
 
     if any_changes == False:
         if __has_content(states):
-            print("No changes were detected.")
+            print("No changes was detected.")
         else:
             print(f"Directory '{repository_path}' contains no files to back up.")
 
