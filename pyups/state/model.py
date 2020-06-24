@@ -8,10 +8,8 @@ class State:
     Represents the state of an item or file at a point in time. 
     """
 
-    def __init__(self, size: int, created: float, modified: float, hash: str):
+    def __init__(self, size: int, hash: str):
         self.__size = size
-        self.__created = created
-        self.__modified = modified
         self.__hash = hash
 
     @property
@@ -24,24 +22,6 @@ class State:
         return self.__size
 
     @property
-    def created(self) -> float:
-        """
-        Returns
-        -------
-        The time when the file was first created.
-        """
-        return self.__created
-
-    @property
-    def modified(self) -> float:
-        """
-        Returns
-        -------
-        The time when the file was last modified.
-        """
-        return self.__modified
-
-    @property
     def hash(self) -> float:
         """
         Returns
@@ -50,26 +30,27 @@ class State:
         """
         return self.__hash
 
-    def has_changed(self, stats: stat_result) -> bool :
-        """Compares this `State` against those stored in a `state_result` (from 
-        `Path.stat <https://docs.python.org/3/library/pathlib.html#pathlib.Path.stat>`)
-        to determine whether the state has changed or not. It has considered to
-        have changed if the either the size, modified or created times differ.
+    def has_changed(self, other) -> bool:
+        """
+        Compares this `State` against another an instance to determine whether
+        an item has changed or not. The state is considered to have changed if
+
         
         Parameters
         ----------
-        stats
-            The `stat_result` for the file. The size, modified and created times
-            will be compared against those stored in this instancee to determine
-            if the file has changed.
+        other
+            The other `State` object that this one will be compared against.
 
         Returns
         -------
-        `True` if either the size, modified or created times are different.
-        Otherwise, `False` if there are all still the same.
+        `True` if the states are different. Otherwise, `False` if there are all
+        still the same.
         """
+        if other == None:
+            return True
 
-        return self.__size != stats.st_size or self.__created != stats.st_ctime or self.__modified != stats.st_mtime
+        return (self.__size != other.size
+            or self.__hash != other.hash)
 
 class Builder:
     """
@@ -77,8 +58,6 @@ class Builder:
     """
     def __init__(self):
         self.size = None
-        self.created = None
-        self.modified = None
         self.hash = None
     
     """
@@ -92,11 +71,9 @@ class Builder:
     """
     def build(self) -> State:
         assert self.size is not None and type(self.size) is int
-        assert self.created is not None and type(self.created) is float
-        assert self.modified is not None and type(self.modified) is float
         assert self.hash is not None and type(self.hash) is str
 
-        return State(size=self.size, created=self.created, modified=self.modified, hash=self.hash)
+        return State(size=self.size, hash=self.hash)
 
 READ_SIZE = 65536 * 8
 
@@ -125,5 +102,5 @@ def calculate_state(path: Path) -> State:
     """
     stats = path.stat()
     file_hash = __calculate_hash(path)
-    logging.info(f"{path}, Size={stats.st_size}, Created={stats.st_ctime}, Modified={stats.st_mtime}, Hash={file_hash}");
-    return State(stats.st_size, stats.st_ctime, stats.st_mtime, file_hash)
+    logging.info(f"{path}, Size={stats.st_size}, Hash={file_hash}");
+    return State(stats.st_size, file_hash)

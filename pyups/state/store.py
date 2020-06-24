@@ -12,8 +12,6 @@ class StateStore:
 
     __PARSERS = {
         "size": int,
-        "created": float,
-        "modified": float,
         "hash": lambda x: x
     }
 
@@ -115,7 +113,7 @@ class StateStore:
                     parser = StateStore.__PARSERS[key]
                     setattr(builder, key, parser(value))    
             result = builder.build()
-            logging.debug(f"Stored: {path}, Size={result.size}, Created={result.created}, Modified={result.modified}, Hash={result.hash}");
+            logging.debug(f"Stored: {path}, Size={result.size}, Hash={result.hash}");
         else:
             logging.debug(f"No state stored yet for {path}")
 

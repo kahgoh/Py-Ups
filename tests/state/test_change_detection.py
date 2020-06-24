@@ -57,6 +57,10 @@ def repository_path(tmp_path) -> Path:
 
     return tmp_path
 
+def write_content(file_path: Path, content: str) -> None:
+    with file_path.open(mode="w") as file:
+        file.write(content)
+
 def test_changes_before_commits(repository_path: Path) -> None:
     expected = [Path(x) for x in CONTENT.keys() ]
 
@@ -130,3 +134,16 @@ def test_changes_after_delete_commit(repository_path: Path, to_delete: str) -> N
 
     # After committing the deletes, there should be no more changes.
     assert [c for c in repository.changes()] == []
+
+def test_detect_single_character_change(tmp_path: Path) -> None:
+    file_path = tmp_path.joinpath("content")
+    write_content(file_path, "abcdef")
+
+    repository = StateRepository(root_path=tmp_path)
+    for c in repository.changes():
+        c.commit
+
+    write_content(file_path, "abcdeg")
+    changes = [c.item_path for c in repository.changes()]
+
+    assert changes == [file_path]

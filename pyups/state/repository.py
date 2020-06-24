@@ -159,20 +159,18 @@ class StateRepository:
             logging.debug(f"Checking path: {entry}")
             relativized = entry.relative_to(self.__root_path)
             stored_state = self.__state_store.get_state(relativized)
+            state_on_system = calculate_state(path=entry)
 
             if stored_state is None:
                 # The entry has not yet been stored in the state.
                 logging.debug(f"No state available for path. {entry} is new.")
-                item_state = calculate_state(entry)
                 yield Change(repository_root=self.__root_path, 
                     item=relativized,
                     previous_state=None, 
-                    new_state=item_state, 
+                    new_state=state_on_system,
                     state_store=self.__state_store)
             else:
-                # Compare the stored state against the file stats.
-                stats = entry.stat()
-                if stored_state.has_changed(stats):
+                if stored_state.has_changed(other=state_on_system):
                     logging.debug(f"State of file {entry} has changed")
                     item_state = calculate_state(entry)
                     yield Change(repository_root=self.__root_path, 
