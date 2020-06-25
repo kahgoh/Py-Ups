@@ -52,6 +52,18 @@ class State:
         return (self.__size != other.size
             or self.__hash != other.hash)
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, self.__class__):
+            return (self.size == other.size and
+                self.hash == other.hash)
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        return hash((self.size, self.hash))
+
+    def __str__(self) -> str:
+        return f"State(size={self.size}, hash='{self.hash}')"
+
 class Builder:
     """
     This a builder implementation for building a `State` instance, which is supposed to be immutable.
