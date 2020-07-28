@@ -22,7 +22,7 @@ class State:
         return self.__size
 
     @property
-    def hash(self) -> float:
+    def hash(self) -> str:
         """
         Returns
         -------
