@@ -69,7 +69,7 @@ def test_calculate_state(sample) -> None:
 
     actual = {
         "size": calculated.size,
-        "hash": calculated.hash
+        "hash": calculated.content_hash
     }
 
     assert actual == expected

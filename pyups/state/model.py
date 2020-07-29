@@ -8,9 +8,9 @@ class State:
     Represents the state of an item or file at a point in time. 
     """
 
-    def __init__(self, size: int, hash: str):
+    def __init__(self, size: int, content_hash: str):
         self.__size = size
-        self.__hash = hash
+        self.__content_hash = content_hash
 
     @property
     def size(self) -> int:
@@ -22,13 +22,13 @@ class State:
         return self.__size
 
     @property
-    def hash(self) -> str:
+    def content_hash(self) -> str:
         """
         Returns
         -------
         The hash of the file's contents.
         """
-        return self.__hash
+        return self.__content_hash
 
     def has_changed(self, other) -> bool:
         """
@@ -50,19 +50,19 @@ class State:
             return True
 
         return (self.__size != other.size
-            or self.__hash != other.hash)
+            or self.__content_hash != other.content_hash)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
             return (self.size == other.size and
-                self.hash == other.hash)
+                self.content_hash == other.content_hash)
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash((self.size, self.hash))
+        return hash((self.size, self.content_hash))
 
     def __str__(self) -> str:
-        return f"State(size={self.size}, hash='{self.hash}')"
+        return f"State(size={self.size}, content_hash='{self.content_hash}')"
 
 class Builder:
     """
@@ -70,7 +70,7 @@ class Builder:
     """
     def __init__(self):
         self.size = None
-        self.hash = None
+        self.content_hash = None
     
     """
     Builds an instance of the `State` object based on the values currently 
@@ -83,9 +83,9 @@ class Builder:
     """
     def build(self) -> State:
         assert self.size is not None and type(self.size) is int
-        assert self.hash is not None and type(self.hash) is str
+        assert self.content_hash is not None and type(self.content_hash) is str
 
-        return State(size=self.size, hash=self.hash)
+        return State(size=self.size, content_hash=self.content_hash)
 
 READ_SIZE = 65536 * 8
 

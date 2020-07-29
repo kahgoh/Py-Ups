@@ -10,9 +10,10 @@ class StateStore:
     """
     __STATE_STORE_PATH = Path("state")
 
+    # TODO: Field renamed to content hash, need to allow the field name to be different.
     __PARSERS = {
-        "size": int,
-        "hash": lambda x: x
+        "size": ("size", int),
+        "hash": ("content_hash", lambda x: x)
     }
 
     def __init__(self, store_root: Path):
@@ -86,7 +87,8 @@ class StateStore:
 
     @staticmethod
     def __contentAsBytes(source, attribute) -> bytes:
-        value = getattr(source, attribute)
+        (attribute_name) = StateStore.__PARSERS[attribute][0]
+        value = getattr(source, attribute_name)
         return bytes(f"{attribute}: {value}{os.linesep}", "utf-8")
 
     def get_state(self, path: Path) -> State:
@@ -110,10 +112,10 @@ class StateStore:
                 builder = state.Builder()
                 for line in entry:
                     key, value = [word.strip() for word in line.split(sep=":", maxsplit=1)]
-                    parser = StateStore.__PARSERS[key]
-                    setattr(builder, key, parser(value))    
+                    (attribute, parser) = StateStore.__PARSERS[key]
+                    setattr(builder, attribute, parser(value))    
             result = builder.build()
-            logging.debug(f"Stored: {path}, Size={result.size}, Hash={result.hash}");
+            logging.debug(f"Stored: {path}, Size={result.size}, Hash={result.content_hash}")
         else:
             logging.debug(f"No state stored yet for {path}")
 
