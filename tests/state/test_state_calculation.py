@@ -17,7 +17,7 @@ CONTENT = {
             #    readable, writable, and searchable only by the
             #    creating user ID.
         , "size": 281
-        , "hash": "ba67180097e58a2b2037f66e60d7620cebb7fa4a"
+        , "hash": "3e5fed0da2457a5c47df03691f94e9d3d27d00f60bcd0c188007a14c4aab01dc"
     }, 
     "story": {
         "content": "T25jZSB1cG9uIGEgdGltZSB0aGVyZSB3ZXJlIHRocmVlIGJlYXJzIHdobyBsaXZlZCBpbiBhCmhvdXNlIGluIHRoZSBmb3Jlc3QuIFRoZXJld2FzIGEgZ3JlYXQgYmlnIGZhdGhlciBiZWFyLCBhIAptaWRkbGUtc2l6ZWQgbW90aGVyIGJlYXIgYW5kIGEgdGlueSBiYWJ5IGJlYXIuIE9uZSAKbW9ybmluZywgdGhlaXIgYnJlYWtmYXN0IHBvcnJpZGdlIHdhcyB0b28gaG90IHRvIGVhdCwgc28KdGhleSBkZWNpZGVkIHRvIGdvIGZvciBhIHdhbGsgaW4gdGhlIGZvcmVzdC4="
@@ -27,12 +27,12 @@ CONTENT = {
             # morning, their breakfast porridge was too hot to eat, so
             # they decided to go for a walk in the forest.
         , "size": 266
-        , "hash": "6274c99919fa355879cfc43838c718cf231356ed"
+        , "hash": "3907c0ff5efe64a96a6fe8aa01186f57bde6fd8c196b74967fb274683020032a"
     }, 
     "names": {
         "content": "QWRhbSBFdmUgSmFjayBKaWxsIEhhbnNlbCBHcmV0ZWw="
         , "size": 32
-        , "hash": "31222fa4058e916488289a3c41e0a75a57fc6947"
+        , "hash": "394de74a5476b3b245f1e4938daa68825a9a57f27074bdd67bfe2936f7dcefb0"
     }
 }
 

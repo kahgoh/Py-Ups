@@ -90,7 +90,7 @@ class Builder:
 READ_SIZE = 65536 * 8
 
 def __calculate_hash(path: Path) -> str:
-    calculator = hashlib.sha1()
+    calculator = hashlib.sha3_256()
     with path.open('rb') as content:
         chunk = content.read(READ_SIZE)
         while chunk:
