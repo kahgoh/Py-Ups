@@ -114,5 +114,5 @@ def calculate_state(path: Path) -> State:
     """
     stats = path.stat()
     file_hash = __calculate_hash(path)
-    logging.info(f"{path}, Size={stats.st_size}, Hash={file_hash}");
+    logging.info(f"{path}, Size={stats.st_size}, Hash={file_hash}")
     return State(stats.st_size, file_hash)
