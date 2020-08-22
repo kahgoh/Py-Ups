@@ -37,22 +37,18 @@ CONTENT = {
 }
 
 @pytest.fixture(params=CONTENT)
-def sample(request) -> dict:
+def sample(request, tmp_path) -> dict:
     """
     Prepares a temporary directory with the sample data for the tests.
     """
     content = dict(CONTENT[request.param])
-    temporary_directory = TemporaryDirectory()
-    path = Path(temporary_directory.name).joinpath(request.param)
+    path = tmp_path.joinpath(request.param)
 
-    # Store the temporary directory context to ensure that the files hang 
-    # around for the tests.
-    content["temporary_directory"] = temporary_directory
+    # Store the path so that the tests know where to find it.
     content["path"] = path
 
-    with path.open(mode="wb") as file:
-        decodedBytes = base64.standard_b64decode(content["content"])
-        file.write(decodedBytes)
+    decodedBytes = base64.standard_b64decode(content["content"])
+    path.write_bytes(decodedBytes)
 
     logging.info(f"Sample data stored in: {path}")
 

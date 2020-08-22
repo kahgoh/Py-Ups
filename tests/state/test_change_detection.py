@@ -46,20 +46,14 @@ def repository_path(tmp_path) -> Path:
 
     for (name, entry) in CONTENT.items():
         file_path = tmp_path.joinpath(name)
-        parent_path = file_path.parent
-        if not parent_path.exists():
-            parent_path.mkdir(parents=True)
+        if not file_path.parent.exists():
+            file_path.parent.mkdir(parents=True)
 
-        with file_path.open(mode="w") as file:
-            file.write(entry)
+        file_path.write_text(entry)
 
     logging.info(f"Sample content created in: {tmp_path}")
 
     return tmp_path
-
-def write_content(file_path: Path, content: str) -> None:
-    with file_path.open(mode="w") as file:
-        file.write(content)
 
 def test_changes_before_commits(repository_path: Path) -> None:
     expected = [Path(x) for x in CONTENT.keys() ]
@@ -137,13 +131,13 @@ def test_changes_after_delete_commit(repository_path: Path, to_delete: str) -> N
 
 def test_detect_single_character_change(tmp_path: Path) -> None:
     file_path = tmp_path.joinpath("content")
-    write_content(file_path, "abcdef")
+    file_path.write_text("abcdef")
 
     repository = StateRepository(root_path=tmp_path)
     for c in repository.changes():
         c.commit
 
-    write_content(file_path, "abcdeg")
+    file_path.write_text("abcdeg")
     changes = [c.item_path for c in repository.changes()]
 
     assert changes == [file_path]
