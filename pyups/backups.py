@@ -1,11 +1,18 @@
 import boto3
 import logging
-import pyups.arrays as arrays
 from pathlib import Path
 from pyups import encryption
 from pyups.configuration import Configuration
 from pyups.state.repository import StateRepository
 from botocore.exceptions import ClientError
+
+"""
+When files from the repository are deleted, their backup copies in the S3
+bucket are also deleted. S3 allows each delete request to contain multiple
+items to delete. This value is the maximum number of items that each delete
+request should contain.
+"""
+__DELETE_GROUP_SIZE = 500
 
 def backup(repository_path: Path, configuration: Configuration) -> None:
     """
@@ -48,7 +55,10 @@ def backup(repository_path: Path, configuration: Configuration) -> None:
                 logging.info(f'Item {c.item.as_posix()} is no longer in filesystem. It will be deleted.')
                 to_delete.append(c)
 
-    for sublist in arrays.partition(array=to_delete, max_length=500):
+    delete_groups = [ to_delete[i:min(i + __DELETE_GROUP_SIZE, len(to_delete))]
+        for i in range(0, len(to_delete), __DELETE_GROUP_SIZE) ]
+
+    for sublist in delete_groups:
         keys = [ { 'Key': f"content/{c.item.as_posix()}" } for c in sublist ]
         response = bucket.delete_objects(Delete={ 'Objects': keys , 'Quiet': True})
 
