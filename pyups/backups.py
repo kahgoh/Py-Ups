@@ -2,6 +2,7 @@ import boto3
 import logging
 import pyups.arrays as arrays
 from pathlib import Path
+from pyups import encryption
 from pyups.configuration import Configuration
 from pyups.state.repository import StateRepository
 from botocore.exceptions import ClientError
@@ -22,6 +23,11 @@ def backup(repository_path: Path, configuration: Configuration) -> None:
     bucket = s3.Bucket(configuration.s3_bucket)
     states = StateRepository(root_path=repository_path)
 
+    if configuration.encryption_password:
+        file_provider = lambda file: encryption.encrypted_file(source=file, password=configuration.encryption_password)
+    else:
+        file_provider = lambda file: (file, lambda: None)
+
     any_changes = False
     to_delete = []
     for c in states.changes():
@@ -29,7 +35,11 @@ def backup(repository_path: Path, configuration: Configuration) -> None:
         if (c.item_path.exists()):
             if (not c.previous_state) or c.previous_state.hash != c.new_state.hash:
                 logging.info(f'Uploading item {c.item.as_posix()}.')
-                bucket.upload_file(c.item_path.as_posix(), f"content/{c.item.as_posix()}")
+                (to_upload, cleanup) = file_provider(c.item_path)
+                try:
+                    bucket.upload_file(to_upload.as_posix(), f"content/{c.item.as_posix()}")
+                finally:
+                    cleanup()
             else:
                 logging.info(f'Content of item {c.item.as_posix()} has not changed, skipping upload.')
             c.commit()
