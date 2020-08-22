@@ -4,6 +4,7 @@ from pyups import encryption
 
 TEST_CONTENT = "A historical way to create temporary files was to..."
 
+
 @pytest.fixture
 def sample_path(tmp_path) -> Path:
     """
@@ -24,6 +25,7 @@ def sample_path(tmp_path) -> Path:
 
     return sample_file
 
+
 def test_encrypted_content(sample_path):
     """
     Tests that the content of the file provided by `encryption.encrypted_file`
@@ -39,12 +41,14 @@ def test_encrypted_content(sample_path):
     finally:
         cleanup()
 
+
 def test_encrypted_cleanup(sample_path):
     """
     Tests that the clean up function provided by `encryption.encrypted_file`
     deletes **ONLY** the encrypted file that it provided.
     """
-    (encrypted_file, cleanup) = encryption.encrypted_file(sample_path, "abcdef")
+    (encrypted_file,
+     cleanup) = encryption.encrypted_file(sample_path, "abcdef")
     cleanup()
 
     assert sample_path.exists()

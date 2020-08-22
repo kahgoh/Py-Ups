@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from pyups.state.store import StateStore
 from pyups.state.repository import StateRepository, Change
-
 """
 This describes the initial content that will be set up for the tests. The keys
 are the names of the file or directory. If the value, is a `str`, then it is
@@ -12,25 +11,23 @@ file with the content set to the value. If the value is `dict`, then it is a
 directory whose contents are described by the sub-dictionary.
 """
 CONTENT = {
-    "document": 
-"""tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
+    "document": """tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
     Creates a temporary directory in the most secure
     manner possible. There are no race conditions in
     the directory’s creation. The directory is 
     readable, writable, and searchable only by the
     creating user ID.""",
-    "story.doc": 
-"""Once upon a time there were three bears who lived in a
+    "story.doc": """Once upon a time there were three bears who lived in a
 house in the forest. Therewas a great big father bear, a 
 middle-sized mother bear and a tiny baby bear. One 
 morning, their breakfast porridge was too hot to eat, so
 they decided to go for a walk in the forest.""",
     "names.txt": "Adam Eve Jack Jill Hansel Gretel",
-    "reports/scores.csv": 
-"""1, 2, 3
+    "reports/scores.csv": """1, 2, 3
 4, 5, 6
 """
 }
+
 
 @pytest.fixture
 def repository_path(tmp_path) -> Path:
@@ -55,21 +52,26 @@ def repository_path(tmp_path) -> Path:
 
     return tmp_path
 
+
 def test_changes_before_commits(repository_path: Path) -> None:
-    expected = [Path(x) for x in CONTENT.keys() ]
+    expected = [Path(x) for x in CONTENT.keys()]
 
     repository = StateRepository(root_path=repository_path)
     actual = [c.item for c in repository.changes()]
 
     assert Counter(expected) == Counter(actual)
 
+
 def test_previous_state_before_commits(repository_path: Path) -> None:
-    expected = [Path(x) for x in CONTENT.keys() ]
+    expected = [Path(x) for x in CONTENT.keys()]
     repository = StateRepository(root_path=repository_path)
 
-    none_previous_state = [c.item for c in repository.changes() if c.previous_state == None ]
+    none_previous_state = [
+        c.item for c in repository.changes() if c.previous_state == None
+    ]
 
     assert Counter(expected) == Counter(none_previous_state)
+
 
 def test_no_changes_after_commit(repository_path: Path) -> None:
     repository = StateRepository(root_path=repository_path)
@@ -79,6 +81,7 @@ def test_no_changes_after_commit(repository_path: Path) -> None:
     changes_after_commit = [c.item for c in repository.changes()]
 
     assert len(changes_after_commit) == 0
+
 
 @pytest.mark.parametrize("item", CONTENT.keys())
 def test_changes_after_commit(repository_path: Path, item: str) -> None:
@@ -92,7 +95,8 @@ def test_changes_after_commit(repository_path: Path, item: str) -> None:
 
     changes = [c.item for c in repository.changes()]
 
-    assert [Path(item)] == changes 
+    assert [Path(item)] == changes
+
 
 @pytest.mark.parametrize("to_delete", CONTENT.keys())
 def test_delete_after_commit(repository_path: Path, to_delete: str) -> None:
@@ -112,8 +116,10 @@ def test_delete_after_commit(repository_path: Path, to_delete: str) -> None:
     # The change should represent a delete.
     assert changes[0].previous_state != None and changes[0].new_state == None
 
+
 @pytest.mark.parametrize("to_delete", CONTENT.keys())
-def test_changes_after_delete_commit(repository_path: Path, to_delete: str) -> None:
+def test_changes_after_delete_commit(repository_path: Path,
+                                     to_delete: str) -> None:
     repository = StateRepository(root_path=repository_path)
     for c in repository.changes():
         c.commit()
@@ -128,6 +134,7 @@ def test_changes_after_delete_commit(repository_path: Path, to_delete: str) -> N
 
     # After committing the deletes, there should be no more changes.
     assert [c for c in repository.changes()] == []
+
 
 def test_detect_single_character_change(tmp_path: Path) -> None:
     file_path = tmp_path.joinpath("content")

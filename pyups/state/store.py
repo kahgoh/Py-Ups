@@ -4,6 +4,7 @@ import pyups.state.model as state
 import logging
 import os
 
+
 class StateStore:
     """
     Provides facilities for storing information about the state of files.
@@ -11,10 +12,7 @@ class StateStore:
     __STATE_STORE_PATH = Path("state")
 
     # TODO: Field renamed to content hash, need to allow the field name to be different.
-    __PARSERS = {
-        "size": ("size", int),
-        "hash": ("content_hash", lambda x: x)
-    }
+    __PARSERS = {"size": ("size", int), "hash": ("content_hash", lambda x: x)}
 
     def __init__(self, store_root: Path):
         """
@@ -44,14 +42,16 @@ class StateStore:
         if state:
             state_file.parent.mkdir(parents=True, exist_ok=True)
             with state_file.open(mode="wb") as entry:
-                content = [StateStore.__contentAsBytes(state, attribute) for attribute in StateStore.__PARSERS]
+                content = [
+                    StateStore.__contentAsBytes(state, attribute)
+                    for attribute in StateStore.__PARSERS
+                ]
                 entry.writelines(content)
         else:
             logging.debug(f"Clearing state for {item}.")
             if state_file.exists():
                 state_file.unlink()
 
-  
     def stored_items(self) -> Path:
         for item in self.__stored_items(self, from_item=Path(".")):
             yield item
@@ -73,17 +73,20 @@ class StateStore:
         Items that have been previously stored in the store.
         """
         path_in_store = self.__store_path.joinpath(from_item)
-        
+
         if path_in_store.exists() and path_in_store.is_dir():
             for candidate in path_in_store.iterdir():
                 child_item = candidate.relative_to(self.__store_path)
                 if candidate.is_dir() and not (candidate.name == ".pyups"):
-                    for item in self.__stored_items(self=self, from_item=child_item):
+                    for item in self.__stored_items(self=self,
+                                                    from_item=child_item):
                         yield item
                 elif candidate.is_file():
                     yield child_item
         else:
-            logging.debug(f"Store path {path_in_store} does not exist. Nothing to yield.")
+            logging.debug(
+                f"Store path {path_in_store} does not exist. Nothing to yield."
+            )
 
     @staticmethod
     def __contentAsBytes(source, attribute) -> bytes:
@@ -111,11 +114,16 @@ class StateStore:
             with state_file.open(mode="rt") as entry:
                 builder = state.Builder()
                 for line in entry:
-                    key, value = [word.strip() for word in line.split(sep=":", maxsplit=1)]
+                    key, value = [
+                        word.strip()
+                        for word in line.split(sep=":", maxsplit=1)
+                    ]
                     (attribute, parser) = StateStore.__PARSERS[key]
-                    setattr(builder, attribute, parser(value))    
+                    setattr(builder, attribute, parser(value))
             result = builder.build()
-            logging.debug(f"Stored: {path}, Size={result.size}, Hash={result.content_hash}")
+            logging.debug(
+                f"Stored: {path}, Size={result.size}, Hash={result.content_hash}"
+            )
         else:
             logging.debug(f"No state stored yet for {path}")
 

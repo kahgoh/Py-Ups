@@ -10,6 +10,7 @@ from pyups.state.store import StateStore
 
 READ_SIZE = 65536 * 8
 
+
 def calculate_hash(path: Path) -> str:
     """
     Calculates a hash of the contents of the file, which may be used to detect
@@ -39,19 +40,16 @@ class Change:
     """
     Describes the difference in the `State` of an item in the `Repository`.
     """
-    def __init__(self, 
-        repository_root: Path, 
-        item: Path, 
-        previous_state: State,
-        new_state: State, 
-        state_store: StateStore):
+    def __init__(self, repository_root: Path, item: Path,
+                 previous_state: State, new_state: State,
+                 state_store: StateStore):
 
         self.__repository_root = repository_root
         self.__item = item
         self.__previous_state = previous_state
         self.__new_state = new_state
         self.__state_store = state_store
-    
+
     @property
     def item(self):
         """
@@ -96,14 +94,18 @@ class Change:
         committed, the `Repository.changes()` will no longer provide the item
         as a `Change` unless another change is made to the item.
         """
-        self.__state_store.store_state(item=self.__item, state=self.__new_state)
+        self.__state_store.store_state(item=self.__item,
+                                       state=self.__new_state)
+
 
 class StateRepository:
     """
     Representation of the state of files in a directory. Provides facilities to
     look for files that have changed since their state was last stored.
     """
-    def __init__(self, root_path: Path, data_directory_name: str = configuration.DATA_PATH):
+    def __init__(self,
+                 root_path: Path,
+                 data_directory_name: str = configuration.DATA_PATH):
         self.__root_path = root_path
         self.__data_path = root_path.joinpath(data_directory_name)
         self.__state_store = StateStore(self.__data_path)
@@ -117,7 +119,7 @@ class StateRepository:
         repository are files in the repository, expressed as a file path 
         relative to this root.
         """
-        return self.__root_path 
+        return self.__root_path
 
     def content_paths(self) -> Path:
         """
@@ -164,20 +166,20 @@ class StateRepository:
             if stored_state is None:
                 # The entry has not yet been stored in the state.
                 logging.debug(f"No state available for path. {entry} is new.")
-                yield Change(repository_root=self.__root_path, 
-                    item=relativized,
-                    previous_state=None, 
-                    new_state=state_on_system,
-                    state_store=self.__state_store)
+                yield Change(repository_root=self.__root_path,
+                             item=relativized,
+                             previous_state=None,
+                             new_state=state_on_system,
+                             state_store=self.__state_store)
             else:
                 if stored_state.has_changed(other=state_on_system):
                     logging.debug(f"State of file {entry} has changed")
                     item_state = calculate_state(entry)
-                    yield Change(repository_root=self.__root_path, 
-                        item=relativized, 
-                        previous_state=stored_state, 
-                        new_state=item_state, 
-                        state_store=self.__state_store)
+                    yield Change(repository_root=self.__root_path,
+                                 item=relativized,
+                                 previous_state=stored_state,
+                                 new_state=item_state,
+                                 state_store=self.__state_store)
 
         # Search for items in the store that have been deleted. Since the above
         # loop has handled the case where the item still exists but has been
@@ -188,8 +190,7 @@ class StateRepository:
             if not item_path.exists():
                 stored_state = self.__state_store.get_state(entry)
                 yield Change(repository_root=self.__root_path,
-                    item=entry,
-                    previous_state=stored_state,
-                    new_state=None,
-                    state_store=self.__state_store)
-
+                             item=entry,
+                             previous_state=stored_state,
+                             new_state=None,
+                             state_store=self.__state_store)

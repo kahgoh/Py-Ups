@@ -6,7 +6,8 @@ from pyups.configuration import get_configuration
 
 logging.config.fileConfig('logging.ini')
 
-parser = ArgumentParser(prog="pyups", description="Back up a directory into an Amazon S3 bucket")
+parser = ArgumentParser(
+    prog="pyups", description="Back up a directory into an Amazon S3 bucket")
 parser.add_argument("directory", help="The path of the directory to backup.")
 arguments = parser.parse_args()
 

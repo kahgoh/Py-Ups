@@ -2,7 +2,8 @@ import logging
 from pyups.state.model import State, calculate_state
 from pytest import fixture
 from pathlib import Path
- 
+
+
 def test_no_change(tmp_path) -> None:
     """
     Test that `State.has_changed` returns `False` if the content has not changed.
@@ -13,6 +14,7 @@ def test_no_change(tmp_path) -> None:
     state = calculate_state(path)
     updated_state = calculate_state(path)
     assert state.has_changed(updated_state) == False
+
 
 def test_changed_different_content(tmp_path) -> None:
     """
@@ -25,6 +27,7 @@ def test_changed_different_content(tmp_path) -> None:
     path.write_text("New content")
     updated_state = calculate_state(path)
     assert state.has_changed(updated_state) == True
+
 
 def test_changed_content_rewritten(tmp_path) -> None:
     """
@@ -41,6 +44,7 @@ def test_changed_content_rewritten(tmp_path) -> None:
     path.write_text(content)
     updated_state = calculate_state(path)
     assert state.has_changed(updated_state) == False
+
 
 def test_changed_content_same_length(tmp_path) -> None:
     """

@@ -29,3 +29,4 @@ toml==0.10.1
 urllib3==1.25.9
 wcwidth==0.1.9
 wrapt==1.12.1
+yapf==0.30.0

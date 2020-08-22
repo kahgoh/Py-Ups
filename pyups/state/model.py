@@ -3,11 +3,11 @@ import logging
 from pathlib import Path
 from os import stat_result
 
+
 class State:
     """
     Represents the state of an item or file at a point in time. 
     """
-
     def __init__(self, size: int, content_hash: str):
         self.__size = size
         self.__content_hash = content_hash
@@ -50,12 +50,12 @@ class State:
             return True
 
         return (self.__size != other.size
-            or self.__content_hash != other.content_hash)
+                or self.__content_hash != other.content_hash)
 
     def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
-            return (self.size == other.size and
-                self.content_hash == other.content_hash)
+            return (self.size == other.size
+                    and self.content_hash == other.content_hash)
         return NotImplemented
 
     def __hash__(self) -> int:
@@ -64,6 +64,7 @@ class State:
     def __str__(self) -> str:
         return f"State(size={self.size}, content_hash='{self.content_hash}')"
 
+
 class Builder:
     """
     This a builder implementation for building a `State` instance, which is supposed to be immutable.
@@ -71,7 +72,7 @@ class Builder:
     def __init__(self):
         self.size = None
         self.content_hash = None
-    
+
     """
     Builds an instance of the `State` object based on the values currently 
     stored. All values must have been set and supplied prior to calling 
@@ -81,13 +82,16 @@ class Builder:
     -------
     The `State` instance that was built.
     """
+
     def build(self) -> State:
         assert self.size is not None and type(self.size) is int
         assert self.content_hash is not None and type(self.content_hash) is str
 
         return State(size=self.size, content_hash=self.content_hash)
 
+
 READ_SIZE = 65536 * 8
+
 
 def __calculate_hash(path: Path) -> str:
     calculator = hashlib.sha3_256()
@@ -98,6 +102,7 @@ def __calculate_hash(path: Path) -> str:
             chunk = content.read(READ_SIZE)
 
     return calculator.hexdigest()
+
 
 def calculate_state(path: Path) -> State:
     """
